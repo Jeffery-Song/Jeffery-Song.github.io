@@ -79,4 +79,6 @@ theme: next
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: git@github.com:Jeffery-Song/Jeffery-Song.github.io.git
+  branch: gh-pages
