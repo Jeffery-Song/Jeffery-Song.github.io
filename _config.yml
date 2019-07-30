@@ -81,4 +81,4 @@ theme: next
 deploy:
   type: git
   repo: git@github.com:Jeffery-Song/Jeffery-Song.github.io.git
-  branch: gh-pages
+  branch: master
