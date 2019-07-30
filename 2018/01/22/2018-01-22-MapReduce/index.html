@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.2.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.2.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="##摘要，Intro MapReduce: 一种编程模型，产生、处理大数据集 并行、分布式的实现细节对程序员透明 Map:对输入中的每一个Logical “record”，应用Map操作，计算出一组中间KVPairs Reduce: 对中间KVpairs中key相同的pair进行适当的合并 [TOC] 编程模型map由用户编写，对输入的kvp产生一组中间kvp。MR库将key相同的中间value打">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MapReduce summary">
+<meta property="og:url" content="http://yoursite.com/2018/01/22/2018-01-22-MapReduce/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="##摘要，Intro MapReduce: 一种编程模型，产生、处理大数据集 并行、分布式的实现细节对程序员透明 Map:对输入中的每一个Logical “record”，应用Map操作，计算出一组中间KVPairs Reduce: 对中间KVpairs中key相同的pair进行适当的合并 [TOC] 编程模型map由用户编写，对输入的kvp产生一组中间kvp。MR库将key相同的中间value打">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-29T17:32:29.459Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MapReduce summary">
+<meta name="twitter:description" content="##摘要，Intro MapReduce: 一种编程模型，产生、处理大数据集 并行、分布式的实现细节对程序员透明 Map:对输入中的每一个Logical “record”，应用Map操作，计算出一组中间KVPairs Reduce: 对中间KVpairs中key相同的pair进行适当的合并 [TOC] 编程模型map由用户编写，对输入的kvp产生一组中间kvp。MR库将key相同的中间value打">
+  <link rel="canonical" href="http://yoursite.com/2018/01/22/2018-01-22-MapReduce/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MapReduce summary | Hexo</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br/>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br/>Archives</a>
+
+  </li>
+    </ul>
+    
+
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/2018-01-22-MapReduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">MapReduce summary
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-01-22 00:00:00" itemprop="dateCreated datePublished" datetime="2018-01-22T00:00:00+08:00">2018-01-22</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-30 01:32:29" itemprop="dateModified" datetime="2019-07-30T01:32:29+08:00">2019-07-30</time>
+              </span>
+            
+          
+
+          <br/>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>##摘要，Intro</p>
+<p><a href="https://research.google.com/archive/mapreduce-osdi04.pdf" target="_blank" rel="noopener">MapReduce</a>: 一种编程模型，产生、处理大数据集</p>
+<p>并行、分布式的实现细节对程序员透明</p>
+<p>Map:对输入中的每一个Logical “record”，应用Map操作，计算出一组中间KVPairs</p>
+<p>Reduce: 对中间KVpairs中key相同的pair进行适当的合并</p>
+<p>[TOC]</p>
+<h2 id="编程模型"><a href="#编程模型" class="headerlink" title="编程模型"></a>编程模型</h2><p>map由用户编写，对输入的kvp产生一组中间kvp。MR库将key相同的中间value打包，传给reduce(通过迭代器Iterator传递，从而允许不连续存放)</p>
+<p>reduce由用户编写，将value合并为可能更小的value集合(通常只产生0或1个输出)。</p>
+<blockquote>
+<p>example: 统计单词出现次数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt; map(String key, String value):</span><br><span class="line">&gt;   <span class="comment"># key: document name</span></span><br><span class="line">&gt;   <span class="comment"># value: content</span></span><br><span class="line">&gt;   <span class="keyword">for</span> w <span class="keyword">in</span> value:</span><br><span class="line">&gt;     EmitIntermediate(w, <span class="string">"1"</span>)</span><br><span class="line">&gt; reduce(Stringkey, Iterator values):</span><br><span class="line">&gt;   <span class="comment"># key: a word</span></span><br><span class="line">&gt;   <span class="comment"># values: list of counts</span></span><br><span class="line">&gt;   result = <span class="number">0</span></span><br><span class="line">&gt;   <span class="keyword">for</span> v <span class="keyword">in</span> values:</span><br><span class="line">&gt;     result += ParseInt(v)</span><br><span class="line">&gt;   Emit(AsString(result))</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>中间key与value的类型与输出相同，但与输入不同</p>
+<p>Our(?) C++实现传递值均为字符串，由用户解释</p>
+<p>分布式Grep、URL访问频数统计、转置Web连接图、统计每个主机的高频关键词，单词索引，分布式排序</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>可有多种不同实现(针对不同设备)</p>
+<p>机器错误经常出现</p>
+<p>主节点(Master)、工作节点(Worker)</p>
+<ol>
+<li>MapReduce库将输入分块，Cluster中多台机器运行一个副本</li>
+<li>副本中主结点分配Map与Reduce任务给其余结点</li>
+<li>Map的结点读取输入块内容，获取KVP后传给map函数，中间KVP缓存于内存</li>
+<li>内存中的中间KVP被周期划分，存入磁盘，磁盘位置传给主结点再传给reduce结点</li>
+<li>reduce结点获得位置后调用RPC读取中间KVP，按key排序(可能外部排序)</li>
+<li>reduce结点将同key的values传给reduce函数，结果写到最终输出文件的末尾</li>
+<li>reduce完成后主结点唤醒用户，mapreduce返回</li>
+</ol>
+<h3 id="容错"><a href="#容错" class="headerlink" title="容错"></a>容错</h3><p>主结点周期ping所有结点</p>
+<p>工作结点错误：已完成的map需重新进行，正在进行的map与reduce需重新进行(reduce结果存在Global File System)</p>
+<p>reduce结点都将收到重执行的通知，从而从新结点重新读取</p>
+<p>主结点错误：simple：定期保存恢复点。current：终止mapreduce，用户检查、重启</p>
+<p>map与reduce输出的提交为原子的</p>
+<p>输出被写入私有temp文件，reduce有一个这样的文件，map有R个</p>
+<p>完成时：</p>
+<ul>
+<li>map完成时结点发给主节点临时文件名字。主结点收到已完成结点的消息，忽略；否则记录文件名</li>
+<li>reduce完成时，原子更名将临时输出改为最终输出。若因为出错、备用机制使同一个reduce任务在多个机器执行，底层FS提供的原子更名操作保证FS只含其中一个结果</li>
+</ul>
+<p>确定性语义 不确定的语义</p>
+<h3 id="局部"><a href="#局部" class="headerlink" title="局部"></a>局部</h3><p>GFS，3备份，map就近分配</p>
+<h3 id="粒度"><a href="#粒度" class="headerlink" title="粒度"></a>粒度</h3><p>MR比机器数大很多，动态平衡，加速失败恢复。上限。R由用户指定。M使输入分为16~64MB</p>
+<h3 id="备用任务"><a href="#备用任务" class="headerlink" title="备用任务"></a>备用任务</h3><p>接近完成时，将剩余任务调度给其他机器同时执行</p>
+<h2 id="技巧"><a href="#技巧" class="headerlink" title="技巧"></a>技巧</h2><ul>
+<li>划分函数：根据key用不同方式划分给reduce任务</li>
+<li>顺序：中间kvp增序</li>
+<li>合并：中间kvp发出前先又map机器执行局部合并</li>
+<li>输入输出类型：text例子</li>
+<li><strong>边界效应</strong>：？</li>
+<li>信号处理程序，catch出错，通过UDP发给主节点，下一次跳过该记录</li>
+<li>本地调试</li>
+<li>http server，查看状态</li>
+<li>counter</li>
+</ul>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>成功原因：</p>
+<ol>
+<li>首先，该模型即使是对于没有并行和分布式系统经验的程序员也是很易于使用的，因为它隐藏了并行化、容错机制、局部性优化、以及负载平衡的细节。</li>
+<li>其次，很多种类的问题都很容易表示成MapReduce计算。例如，MapReduce被用于为Google的网络搜索服务的数据产生、排序、数据挖掘、机器学习、以及许多其它系统。</li>
+<li>第三，我们已经开发了一个MapReduce的实现，可以扩展到包含上千台机器的大型集群。该实现可以高效使用这些机器的资源，因此适合于Google遇到的很多大型计算问题。</li>
+</ol>
+<p>经验：</p>
+<ol>
+<li>首先，约束这个编程模型令并行和分布式计算，以及令这些计算可容错，变得简单了。</li>
+<li>其次，网络带宽是一种稀缺资源。我们系统中的很多优化都因此针对减少通过网络发送的数据总量：局部性优化允许我们从本地磁盘读，同时将中间文件写入本地磁盘也节省了网络带宽。</li>
+<li>第三，备用执行可以用于减小缓慢的机器的影响，及应对机器失败和数据丢失。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/01/15/2018-01-15-configure-your-githubio/" rel="next" title="Configure ur own github page">
+                <i class="fa fa-chevron-left"></i> Configure ur own github page
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/01/23/2018-01-23-add-bash-here/" rel="prev" title="Add Bash-here to right-click context">
+                Add Bash-here to right-click context <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编程模型"><span class="nav-number">1.</span> <span class="nav-text">编程模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#容错"><span class="nav-number">2.1.</span> <span class="nav-text">容错</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#局部"><span class="nav-number">2.2.</span> <span class="nav-text">局部</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#粒度"><span class="nav-number">2.3.</span> <span class="nav-text">粒度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备用任务"><span class="nav-number">2.4.</span> <span class="nav-text">备用任务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技巧"><span class="nav-number">3.</span> <span class="nav-text">技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.2.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.2.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
