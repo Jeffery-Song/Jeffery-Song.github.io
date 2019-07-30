@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle:
+title: Xiaoniu's Blog
+subtitle: This blog is rarely maintained :(
 description:
 keywords:
-author: John Doe
-language:
+author: Xiaoniu Song
+language: en
 timezone:
 
 # URL
@@ -74,7 +74,7 @@ pagination_dir: page
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 # theme: landscape
-theme: next
+theme: indigo
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html

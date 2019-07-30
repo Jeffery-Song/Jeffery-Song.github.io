@@ -16,13 +16,13 @@ date: 2018-01-12 17:45:41 +0800
 
 Chrome下，`F12`快捷键打开开发者工具
 
-![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/2.JPG)
+![](/uploads/2018-01-12-yjsqk/2.JPG)
 
 
 
 点击上方`Console`进入控制台(如上图红圈)
 
-![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/3.JPG)
+![](/uploads/2018-01-12-yjsqk/3.JPG)
 
 确认当前在top域(如上图红圈)，在console中粘贴如下代码，并按回车：
 
@@ -76,7 +76,7 @@ function get_line_with_id(table, id) {
 
 每查询一次，脚本将在console中输出当次查询的人数结果：
 
-![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/4.JPG)
+![](/uploads/2018-01-12-yjsqk/4.JPG)
 
 若你不想有这样的输出，将上图中`Default levels`中的`Info`取消勾选
 
@@ -88,11 +88,11 @@ function get_line_with_id(table, id) {
 
 在Chrome扩展商店中搜索Tampermonkey并安装，安装完成后在Chrome地址栏右侧将出现该扩展的图标：
 
-![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/5.JPG)
+![](/uploads/2018-01-12-yjsqk/5.JPG)
 
 点击该图标，并选择添加新脚本，进入下图界面
 
-![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/1.JPG)
+![](/uploads/2018-01-12-yjsqk/1.JPG)
 
 你可以：
 
@@ -161,7 +161,7 @@ function get_line_with_id(table, id) {
 })();
 ```
 
-点击保存按钮![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/6.JPG)
+点击保存按钮![](/uploads/2018-01-12-yjsqk/6.JPG)
 
 启用脚本方法：
 
@@ -169,11 +169,11 @@ function get_line_with_id(table, id) {
 
 * 点击Tampermonkey扩展按钮，将出现当前脚本的开关
 
-  ![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/9.JPG)
+  ![](/uploads/2018-01-12-yjsqk/9.JPG)
 
 * 打开该开关，并刷新选课页面(刷新后才开启生效)，若观察到隔指定时间(5000ms)页面自动查询，或在Chrome console看到课程人数的输出并且前缀数字增加，则为开启成功：
 
-  ![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/4.JPG)
+  ![](/uploads/2018-01-12-yjsqk/4.JPG)
 
 *Tip:* 你可以选择开课单位，以减少每次查找的流量、时间开销
 
@@ -183,6 +183,6 @@ function get_line_with_id(table, id) {
 
 **Note：**如果你有旧的抢课脚本，请在开启脚本的小弹窗关闭它并保持关闭，或在Tampermonkey管理面板永久删除它：
 
-![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/7.JPG)
+![](/uploads/2018-01-12-yjsqk/7.JPG)
 
-![]({{ site.url }}{{ site.baseurl }}/images/2018-01-12-yjsqk/8.JPG)
+![](/uploads/2018-01-12-yjsqk/8.JPG)
